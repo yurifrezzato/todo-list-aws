@@ -1,11 +1,6 @@
 pipeline {
     agent any;
     
-    parameters {
-        string(name: 'sam_stack_name', defaultValue: 'todo-list-aws')
-        choice(name: 'sam_config_env', choices: ['staging', 'production'])
-    }
-    
     stages {
         stage('Get Code') {
             steps {
@@ -35,12 +30,14 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    curr_stack_name = params.sam_stack_name + '-' + params.sam_config_env;
+                    def sam_stack_name = 'todo-list-aws';
+                    def sam_config_env = 'staging';
+                    curr_stack_name = sam_stack_name + '-' + sam_config_env;
                     
-                    sh '''
+                    sh """
                         sam build
-                        sam deploy --config-file samconfig.toml --stack-name ${curr_stack_name} --config-env ${params.sam_config_env} --save-params
-                    '''
+                        sam deploy --config-file samconfig.toml --stack-name ${curr_stack_name} --config-env ${sam_config_env} --save-params
+                    """
 
                     stack_endpoint = sh(script: 'sam list stack-outputs --stack-name ${curr_stack_name} --region us-east-1 --output json', returnStdout: true);
                     println(stack_endpoint);
