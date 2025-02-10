@@ -34,8 +34,10 @@ pipeline {
                     sam deploy --config-file samconfig.toml --stack-name todo-list-aws --region us-east-1 --config-env staging --no-disable-rollback --no-confirm-changeset --save-params
                 '''
                 
-                stack_endpoint = sh(script: 'sam list stack-outputs --stack-name todo-list-aws --region us-east-1 --output json', returnStdout: true);
-                println(stack_endpoint);
+                script {
+                    stack_endpoint = sh(script: 'sam list stack-outputs --stack-name todo-list-aws --region us-east-1 --output json', returnStdout: true);
+                    println(stack_endpoint);   
+                }
             }
         }
     }
