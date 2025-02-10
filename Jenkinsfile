@@ -1,6 +1,11 @@
 pipeline {
     agent any;
     
+    parameters {
+        string(name: 'sam_stack_name', defaultValue: 'todo-list-aws')
+        choice(name: 'sam_config_env', choices: ['staging', 'production'])
+    }
+    
     stages {
         stage('Get Code') {
             steps {
@@ -29,14 +34,14 @@ pipeline {
         
         stage('Deploy') {
             steps {
+                curr_stack_name = params.sam_stack_name + '-' + sam_config_env;
                 sh '''
                     sam build
-                    sam deploy --config-file samconfig.toml --stack-name todo-list-aws --region us-east-1 --config-env staging --no-disable-rollback --no-confirm-changeset --save-params --resolve-s3
+                    sam deploy --config-file samconfig.toml --stack-name ${curr_stack_name} --config-env ${params.sam_config_env} --save-params
                 '''
-                
                 script {
-                    stack_endpoint = sh(script: 'sam list stack-outputs --stack-name todo-list-aws --region us-east-1 --output json', returnStdout: true);
-                    println(stack_endpoint);   
+                    stack_endpoint = sh(script: 'sam list stack-outputs --stack-name ${curr_stack_name} --region us-east-1 --output json', returnStdout: true);
+                    println(stack_endpoint);
                 }
             }
         }
@@ -44,7 +49,7 @@ pipeline {
     post {
         cleanup {
             cleanWs();
-            sh 'sam delete --no-prompts' // delete sam stack
+            sh 'sam delete --no-prompts --stack-name ${curr_stack_name}' // delete sam stack
         }
     }
 }
