@@ -35,7 +35,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    curr_stack_name = params.sam_stack_name + '-' + sam_config_env;
+                    curr_stack_name = params.sam_stack_name + '-' + params.sam_config_env;
                     
                     sh '''
                         sam build
