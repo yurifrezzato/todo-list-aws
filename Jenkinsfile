@@ -34,12 +34,14 @@ pipeline {
         
         stage('Deploy') {
             steps {
-                curr_stack_name = params.sam_stack_name + '-' + sam_config_env;
-                sh '''
-                    sam build
-                    sam deploy --config-file samconfig.toml --stack-name ${curr_stack_name} --config-env ${params.sam_config_env} --save-params
-                '''
                 script {
+                    curr_stack_name = params.sam_stack_name + '-' + sam_config_env;
+                    
+                    sh '''
+                        sam build
+                        sam deploy --config-file samconfig.toml --stack-name ${curr_stack_name} --config-env ${params.sam_config_env} --save-params
+                    '''
+
                     stack_endpoint = sh(script: 'sam list stack-outputs --stack-name ${curr_stack_name} --region us-east-1 --output json', returnStdout: true);
                     println(stack_endpoint);
                 }
