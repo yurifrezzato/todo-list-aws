@@ -31,7 +31,7 @@ pipeline {
             steps {
                 sh '''
                     sam build
-                    sam deploy --config-file samconfig.toml --stack-name todo-list-aws --region us-east-1 --config-env staging --no-disable-rollback --no-confirm-changeset --save-params
+                    sam deploy --config-file samconfig.toml --stack-name todo-list-aws --region us-east-1 --config-env staging --no-disable-rollback --no-confirm-changeset --save-params --resolve-s3
                 '''
                 
                 script {
