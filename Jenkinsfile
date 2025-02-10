@@ -30,8 +30,8 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    def sam_stack_name = 'todo-list-aws';
-                    def sam_config_env = 'staging';
+                    String sam_stack_name = 'todo-list-aws';
+                    String sam_config_env = 'staging';
                     curr_stack_name = sam_stack_name + '-' + sam_config_env;
                     
                     sh """
@@ -39,6 +39,7 @@ pipeline {
                         sam deploy --config-file samconfig.toml --stack-name ${curr_stack_name} --config-env ${sam_config_env} --save-params
                     """
 
+                    println(curr_stack_name);
                     stack_endpoint = sh(script: 'sam list stack-outputs --stack-name ${curr_stack_name} --region us-east-1 --output json', returnStdout: true);
                     println(stack_endpoint);
                 }
@@ -47,8 +48,9 @@ pipeline {
     }
     post {
         cleanup {
-            cleanWs();
+            println(curr_stack_name);
             sh 'sam delete --no-prompts --stack-name ${curr_stack_name}' // delete sam stack
+            cleanWs();
         }
     }
 }
