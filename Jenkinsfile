@@ -75,7 +75,7 @@ pipeline {
         stage('Promote') {
             steps {
                 println('Write changes in file');
-                sh "echo 'new line ${BUIL_ID}' >> CHANGELOG.MD";
+                sh "echo 'new line ${BUILD_ID}' >> CHANGELOG.MD";
                 
                 println('Merge and push changelog')
                 sh """
