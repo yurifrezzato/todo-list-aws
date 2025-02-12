@@ -42,6 +42,8 @@ pipeline {
 
                     stack_endpoint = sh(script: "sam list stack-outputs --stack-name ${curr_stack_name} --region ${sam_region} --output json", returnStdout: true);
                     println(stack_endpoint);
+                    BASE_URL = stack_endpoint[0].OutputValue;
+                    println(BASE_URL);
                 }
             }
         }
