@@ -6,19 +6,19 @@ pipeline {
     stages {
         stage('Get Code') {
             steps {
-                println(BUILD_ID);
-                
                 withCredentials([usernamePassword(credentialsId: 'github_cred', passwordVariable: 'git_pass', usernameVariable: 'git_usr')]) {
-                    git "https://$git_usr:$git_pass@github.com/yurifrezzato/todo-list-aws.git"
+                    checkout scmGit(
+                        branches: [[
+                            name: 'develop'
+                        ]],
+                        userRemoteConfigs: [[
+                            url: "https://$git_usr:$git_pass@github.com/yurifrezzato/todo-list-aws.git"
+                        ]]
+                    )
                 }
 
-                // git 'https://github.com/yurifrezzato/todo-list-aws.git'
                 sh 'ls -la'
                 echo "WORKSPACE: ${WORKSPACE}"
-                sh '''
-                    git status
-                    git checkout develop
-                '''
             }
         }
         
@@ -77,7 +77,6 @@ pipeline {
             steps {
                 println('Write changes in file');
                 sh "echo 'new line ${BUILD_ID}' >> CHANGELOG.md";
-                sh 'cat CHANGELOG.md'
                 
                 println('Merge and push changelog')
                 sh """
