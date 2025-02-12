@@ -7,10 +7,11 @@ pipeline {
         stage('Get Code') {
             steps {
                 println(BUILD_ID);
-                git credentialsId: 'github_cred', url: 'https://github.com/yurifrezzato/todo-list-aws.git'
-            //     withCredentials([string(credentialsId: 'mytoken', variable: 'TOKEN')]) {
                 
-            // }
+                withCredentials([usernamePassword(credentialsId: 'github_cred', passwordVariable: 'git_pass', usernameVariable: 'git_usr')]) {
+                    git url: "https://${git_usr}:${git_pass}github.com/yurifrezzato/todo-list-aws.git"
+                }
+
                 // git 'https://github.com/yurifrezzato/todo-list-aws.git'
                 sh 'ls -la'
                 echo "WORKSPACE: ${WORKSPACE}"
