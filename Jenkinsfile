@@ -7,34 +7,26 @@ pipeline {
         stage('Get Code') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'github_cred', passwordVariable: 'git_pass', usernameVariable: 'git_usr')]) {
-                    checkout scmGit(
-                        branches: [[
-                            name: 'develop'
-                        ]],
-                        userRemoteConfigs: [[
-                            url: "https://$git_usr:$git_pass@github.com/yurifrezzato/todo-list-aws.git"
-                        ]]
-                    )
+                    git "https://$git_usr:$git_pass@github.com/yurifrezzato/todo-list-aws.git"
                 }
 
                 sh 'ls -la'
                 echo "WORKSPACE: ${WORKSPACE}"
+                sh 'git checkout develop'
             }
         }
         
         stage('Static Test') {
             steps {
-                // catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                    sh '''
-                        python3 -m flake8 --exit-zero --format=pylint ./src > flake8.out
-                    '''
-                    recordIssues tools: [flake8(name: 'Flake8', pattern: 'flake8.out')];
-                    
-                    sh '''
-                        python3 -m bandit --exit-zero -r ./src -f custom -o bandit.out --msg-template "{abspath}:{line}: [{test_id}] {msg}"
-                    '''
-                    recordIssues tools: [pyLint(name: 'Bandit', pattern: 'bandit.out')];
-                // }
+                sh '''
+                    python3 -m flake8 --exit-zero --format=pylint ./src > flake8.out
+                '''
+                recordIssues tools: [flake8(name: 'Flake8', pattern: 'flake8.out')];
+                
+                sh '''
+                    python3 -m bandit --exit-zero -r ./src -f custom -o bandit.out --msg-template "{abspath}:{line}: [{test_id}] {msg}"
+                '''
+                recordIssues tools: [pyLint(name: 'Bandit', pattern: 'bandit.out')];
             }
         }
         
@@ -81,7 +73,6 @@ pipeline {
                 println('Merge and push changelog')
                 sh """
                     git checkout master
-                    git pull
                     git merge develop
                     git push --set-upstream origin master
                 """
