@@ -55,10 +55,10 @@ pipeline {
         }
         stage('Rest Test') {
             steps {
-                sh'''
+                sh"""
                     export PYTHONPATH=${WORKSPACE}
                     python3 -m pytest --junitxml=result-unit.xml test/integration/todoApiTest.py --base_url=${BASE_URL}
-                '''
+                """
             }
         }
     }
