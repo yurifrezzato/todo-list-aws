@@ -30,10 +30,10 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // String sam_stack_name = 'todo-list-aws';
+                    String sam_stack_name = 'todo-list-aws';
                     String sam_config_env = 'staging';
-                    // String sam_region = 'us-east-1';
-                    // curr_stack_name = sam_stack_name + '-' + sam_config_env;
+                    String sam_region = 'us-east-1';
+                    curr_stack_name = sam_stack_name + '-' + sam_config_env;
                     
                     sh """
                         sam build
