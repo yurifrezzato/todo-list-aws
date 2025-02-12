@@ -81,6 +81,7 @@ pipeline {
                 println('Merge and push changelog')
                 sh """
                     git checkout master
+                    git pull
                     git merge develop
                     git push --set-upstream origin master
                 """
