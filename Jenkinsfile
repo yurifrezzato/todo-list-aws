@@ -57,7 +57,8 @@ pipeline {
             steps {
                 sh"""
                     export PYTHONPATH=${WORKSPACE}
-                    python3 -m pytest --junitxml=result-unit.xml test/integration/todoApiTest.py --base_url=${BASE_URL}
+                    export BASE_URL=${BASE_URL}
+                    python3 -m pytest --junitxml=result-unit.xml test/integration/todoApiTest.py
                 """
             }
         }
