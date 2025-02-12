@@ -6,6 +6,7 @@ pipeline {
     stages {
         stage('Get Code') {
             steps {
+                println(BUILD_ID);
                 git credentialsId: 'github_cred', url: 'https://github.com/yurifrezzato/todo-list-aws.git'
             //     withCredentials([string(credentialsId: 'mytoken', variable: 'TOKEN')]) {
                 
@@ -71,10 +72,20 @@ pipeline {
             }
         }
         
-        // stage('Promote') {
-        //     steps {
-        //     }
-        // }
+        stage('Promote') {
+            steps {
+                println('Write changes in file');
+                File changelog = new File('./CHANGELOG.md');
+                changelog.write("\n new line ${BUILD_ID}");
+                
+                println('Merge and push changelog')
+                sh """
+                    git checkout master
+                    git merge develop
+                    git push
+                """
+            }
+        }
     }
     post {
         cleanup {
