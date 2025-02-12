@@ -6,10 +6,17 @@ pipeline {
     stages {
         stage('Get Code') {
             steps {
-                echo 'Get Code'
-                git 'https://github.com/yurifrezzato/todo-list-aws.git'
+                git credentialsId: 'github_cred', url: 'https://github.com/yurifrezzato/todo-list-aws.git'
+            //     withCredentials([string(credentialsId: 'mytoken', variable: 'TOKEN')]) {
+                
+            // }
+                // git 'https://github.com/yurifrezzato/todo-list-aws.git'
                 sh 'ls -la'
                 echo "WORKSPACE: ${WORKSPACE}"
+                sh '''
+                    git status
+                    git checkout develop
+                '''
             }
         }
         
@@ -53,6 +60,7 @@ pipeline {
                 }
             }
         }
+        
         stage('Rest Test') {
             steps {
                 sh"""
@@ -62,6 +70,11 @@ pipeline {
                 """
             }
         }
+        
+        // stage('Promote') {
+        //     steps {
+        //     }
+        // }
     }
     post {
         cleanup {
