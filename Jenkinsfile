@@ -9,7 +9,7 @@ pipeline {
                 println(BUILD_ID);
                 
                 withCredentials([usernamePassword(credentialsId: 'github_cred', passwordVariable: 'git_pass', usernameVariable: 'git_usr')]) {
-                    git url: "https://${git_usr}:${git_pass}github.com/yurifrezzato/todo-list-aws.git"
+                    git "https://${git_usr}:${git_pass}github.com/yurifrezzato/todo-list-aws.git"
                 }
 
                 // git 'https://github.com/yurifrezzato/todo-list-aws.git'
