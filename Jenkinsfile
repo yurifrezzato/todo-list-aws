@@ -40,11 +40,23 @@ pipeline {
                         sam deploy --config-file samconfig.toml --config-env ${sam_config_env} --save-params --no-fail-on-empty-changeset
                     """
 
-                    stack_endpoint = sh(script: "sam list stack-outputs --stack-name ${curr_stack_name} --region ${sam_region} --output json", returnStdout: true);
-                    println(stack_endpoint);
-                    BASE_URL = stack_endpoint[0].OutputValue;
-                    println(BASE_URL);
+                    def stack_endpoint = sh(script: "sam list stack-outputs --stack-name ${curr_stack_name} --region ${sam_region} --output json", returnStdout: true).trim();
+                    // println(stack_endpoint);
+                    
+                    def jsonParser = new JsonSlurper()
+                    def stackOutputs = jsonParser.parseText(stack_endpoint)
+
+                    BASE_URL = stackOutputs[0].OutputValue
+                    // println(BASE_URL);
                 }
+            }
+        }
+        stage('Rest Test') {
+            steps {
+                sh'''
+                    export PYTHONPATH=${WORKSPACE}
+                    pytest --junitxml=result-unit.xml test/integration/todoApiTest.py --base_url=${BASE_URL}
+                '''
             }
         }
     }
