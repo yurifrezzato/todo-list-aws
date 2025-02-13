@@ -33,10 +33,12 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
+                    // Set variables
                     String sam_stack_name = 'todo-list-aws';
                     String sam_config_env = 'staging';
+                    String curr_stack_name = sam_stack_name + '-' + sam_config_env;
+                    
                     String sam_region = 'us-east-1';
-                    curr_stack_name = sam_stack_name + '-' + sam_config_env;
                     
                     sh """
                         sam build
@@ -44,13 +46,10 @@ pipeline {
                     """
 
                     def stack_endpoint = sh(script: "sam list stack-outputs --stack-name ${curr_stack_name} --region ${sam_region} --output json", returnStdout: true).trim();
-                    // println(stack_endpoint);
-                    
                     def jsonParser = new JsonSlurper()
                     def stackOutputs = jsonParser.parseText(stack_endpoint)
 
                     BASE_URL = stackOutputs[0].OutputValue
-                    // println(BASE_URL);
                 }
             }
         }
@@ -60,8 +59,10 @@ pipeline {
                 sh"""
                     export PYTHONPATH=${WORKSPACE}
                     export BASE_URL=${BASE_URL}
-                    python3 -m pytest --junitxml=result-unit.xml test/integration/todoApiTest.py
+                    python3 -m pytest --junitxml=result-rest.xml test/integration/todoApiTest.py
                 """
+                
+                junit 'result-rest.xml';
             }
         }
         
