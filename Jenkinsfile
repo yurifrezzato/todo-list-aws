@@ -69,7 +69,11 @@ pipeline {
         stage('Promote') {
             steps {
                 println('Write changes in file');
-                sh "echo 'new line ${BUILD_ID}' >> CHANGELOG.md";
+                sh """
+                    echo 'new line ${BUILD_ID}' >> CHANGELOG.md
+                    git add .
+                    git commit -m '${BUILD_ID}'
+                """
                 sh 'cat CHANGELOG.md'
                 
                 println('Merge and push changelog')
