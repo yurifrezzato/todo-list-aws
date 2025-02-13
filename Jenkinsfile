@@ -70,6 +70,7 @@ pipeline {
             steps {
                 println('Write changes in file');
                 sh "echo 'new line ${BUILD_ID}' >> CHANGELOG.md";
+                sh 'cat CHANGELOG.md'
                 
                 println('Merge and push changelog')
                 sh """
