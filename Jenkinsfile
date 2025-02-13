@@ -70,7 +70,7 @@ pipeline {
             steps {
                 println('Write changes in file');
                 sh """
-                    echo 'new line ${BUILD_ID}' >> CHANGELOG.md
+                    echo '<br />new line ${BUILD_ID}' >> CHANGELOG.md
                     git add .
                     git commit -m '${BUILD_ID}'
                     git push
