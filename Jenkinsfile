@@ -73,6 +73,7 @@ pipeline {
                     echo 'new line ${BUILD_ID}' >> CHANGELOG.md
                     git add .
                     git commit -m '${BUILD_ID}'
+                    git push
                 """
                 sh 'cat CHANGELOG.md'
                 
