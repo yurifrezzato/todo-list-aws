@@ -75,7 +75,6 @@ pipeline {
                     git commit -m '${BUILD_ID}'
                     git push
                 """
-                sh 'cat CHANGELOG.md'
                 
                 println('Merge and push changelog')
                 sh """
