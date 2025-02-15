@@ -87,7 +87,6 @@ pipeline {
     }
     post {
         cleanup {
-            // sh "sam delete --no-prompts --stack-name ${curr_stack_name}"; // delete sam stack
             cleanWs();
         }
     }
