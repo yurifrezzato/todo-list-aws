@@ -49,10 +49,31 @@ pipeline {
                 junit 'result-rest.xml';
             }
         }
+<<<<<<< HEAD
+=======
+        
+        stage('Promote') {
+            steps {
+                println('Write changes in file');
+                sh """
+                    echo '<br />new line ${BUILD_ID}' >> CHANGELOG.md
+                    git add .
+                    git commit -m '${BUILD_ID}'
+                    git push
+                """
+                
+                println('Merge and push changelog')
+                sh """
+                    git checkout master
+                    git merge develop
+                    git push --set-upstream origin master
+                """
+            }
+        }
+>>>>>>> 945efd1d39417f8d2f7d6d166af1ee1da6dc7a83
     }
     post {
         cleanup {
-            // sh "sam delete --no-prompts --stack-name ${curr_stack_name}"; // delete sam stack
             cleanWs();
         }
     }
