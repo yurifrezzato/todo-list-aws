@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('Get Code') {
             steps {
-                git "https://$git_usr:$git_pass@github.com/yurifrezzato/todo-list-aws.git"
+                git "https://github.com/yurifrezzato/todo-list-aws.git"
 
                 sh 'ls -la'
                 echo "WORKSPACE: ${WORKSPACE}"
