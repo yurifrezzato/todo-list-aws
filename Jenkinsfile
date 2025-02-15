@@ -43,7 +43,7 @@ pipeline {
                 sh"""
                     export PYTHONPATH=${WORKSPACE}
                     export BASE_URL=${BASE_URL}
-                    python3 -m api.readOnly --junitxml=result-rest.xml test/integration/todoApiTest.py
+                    python3 -m pytest -m readOnly --junitxml=result-rest.xml test/integration/todoApiTest.py
                 """
                 
                 junit 'result-rest.xml';
