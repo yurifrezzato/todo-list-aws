@@ -75,9 +75,10 @@ pipeline {
                     def jsonParser = new JsonSlurper();
                     def stackOutputs = jsonParser.parseText(stack_endpoint);
 
-                    BASE_URL = stackOutputs[0].OutputValue;
+                    def BASE_URL = stackOutputs[0].OutputValue;
+                    
+                    writeFile file: 'BASE_URL.txt', text: BASE_URL;
                 }
-                writeFile file: 'BASE_URL.txt', text: BASE_URL;
                 stash name: "BASE_URL", includes: BASE_URL;
             }
             post {
@@ -95,6 +96,10 @@ pipeline {
                 get_info();
                 unstash "BASE_URL";
                 unstash "github_code";
+                
+                script {
+                    BASE_URL = readFile('BASE_URL.txt').trim()
+                }
                 
                 sh"""
                     export PYTHONPATH=${WORKSPACE}
