@@ -77,6 +77,7 @@ pipeline {
 
                     BASE_URL = stackOutputs[0].OutputValue;
                 }
+                writeFile file: 'BASE_URL.txt', text: BASE_URL;
                 stash name: "BASE_URL", includes: BASE_URL;
             }
             post {
