@@ -19,7 +19,7 @@ pipeline {
                 echo "WORKSPACE: ${WORKSPACE}"
                 sh 'git checkout develop'
                 
-                stash name: "github_code", includes: "**";
+                stash name: "github_code", includes: "**", useDefaultExcludes: false;
             }
             post {
                 cleanup {
@@ -79,7 +79,7 @@ pipeline {
                     
                     writeFile file: 'BASE_URL.txt', text: BASE_URL;
                 }
-                stash name: "BASE_URL", includes: BASE_URL;
+                stash name: "BASE_URL", includes: "BASE_URL.txt";
             }
             post {
                 cleanup {
@@ -122,6 +122,7 @@ pipeline {
                 unstash "github_code";
                 
                 println('Write changes in file');
+                
                 sh """
                     echo '<br />new line ${BUILD_ID}' >> CHANGELOG.md
                     git add .
