@@ -2,6 +2,9 @@ import groovy.json.JsonSlurper
 
 pipeline {
     agent any;
+    options {
+        skipDefaultCheckout true //avoid auto checkout in slaves nodes
+    }
     
     stages {
         stage('Get Code') { // nodo principal
@@ -69,14 +72,12 @@ pipeline {
                     """
 
                     def stack_endpoint = sh(script: "sam list stack-outputs --stack-name ${curr_stack_name} --region ${sam_region} --output json", returnStdout: true).trim();
-                    def jsonParser = new JsonSlurper()
-                    def stackOutputs = jsonParser.parseText(stack_endpoint)
+                    def jsonParser = new JsonSlurper();
+                    def stackOutputs = jsonParser.parseText(stack_endpoint);
 
-                    BASE_URL = stackOutputs[0].OutputValue
-                    
-                    stash name: "BASE_URL", includes: BASE_URL;
-                    
+                    BASE_URL = stackOutputs[0].OutputValue;
                 }
+                stash name: "BASE_URL", includes: BASE_URL;
             }
             post {
                 cleanup {
