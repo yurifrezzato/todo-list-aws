@@ -1,7 +1,7 @@
 import groovy.json.JsonSlurper
 
-sam_config_env = 'production';
-github_branch = 'master';
+sam_config_env = 'staging';
+github_branch = 'develop';
 
 pipeline {
     agent any;
@@ -10,18 +10,11 @@ pipeline {
         stage('Get Code') {
             steps {
                 git "https://github.com/yurifrezzato/todo-list-aws.git"
-
+                
                 sh 'ls -la'
                 echo "WORKSPACE: ${WORKSPACE}"
                 sh "git checkout ${github_branch}"
-                
-                script {
-                
-                    sh 'ls -la'
-                    echo "WORKSPACE: ${WORKSPACE}"
-                    sh "git checkout ${github_branch}"
-                    sh "wget https://raw.githubusercontent.com/yurifrezzato/todo-list-aws-config/${sam_config_env}/samconfig.toml"
-                }
+                sh "wget https://raw.githubusercontent.com/yurifrezzato/todo-list-aws-config/${sam_config_env}/samconfig.toml"
             }
         }
         
