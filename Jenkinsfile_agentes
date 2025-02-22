@@ -1,5 +1,8 @@
 import groovy.json.JsonSlurper
 
+sam_config_env = 'staging';
+github_branch = 'develop';
+
 pipeline {
     agent any;
     options {
@@ -16,10 +19,9 @@ pipeline {
                 }
 
                 script {
-                    
                     sh 'ls -la'
                     echo "WORKSPACE: ${WORKSPACE}"
-                    sh 'git checkout develop'
+                    sh "git checkout ${github_branch}"
                     sh "wget https://raw.githubusercontent.com/yurifrezzato/todo-list-aws-config/${sam_config_env}/samconfig.toml"
                 }
                 
@@ -65,7 +67,6 @@ pipeline {
                 script {
                     // Set variables
                     String sam_stack_name = 'todo-list-aws';
-                    String sam_config_env = 'staging';
                     String curr_stack_name = sam_stack_name + '-' + sam_config_env;
                     
                     String sam_region = 'us-east-1';
