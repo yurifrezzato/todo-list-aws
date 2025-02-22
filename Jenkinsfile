@@ -48,11 +48,7 @@ pipeline {
                         sam deploy --config-file samconfig.toml --config-env ${sam_config_env} --save-params --no-fail-on-empty-changeset
                     """
 
-                    def stack_endpoint = sh(script: "sam list stack-outputs --stack-name ${curr_stack_name} --region ${sam_region} --output json", returnStdout: true).trim();
-                    def jsonParser = new JsonSlurper()
-                    def stackOutputs = jsonParser.parseText(stack_endpoint)
-
-                    BASE_URL = stackOutputs[0].OutputValue
+                    BASE_URL = sh( script: "aws cloudformation describe-stacks --stack-name ${curr_stack_name} --query 'Stacks[0].Outputs[?OutputKey==`BaseUrlApi`].OutputValue' --region ${sam_region} --output text", returnStdout: true)
                 }
             }
         }
