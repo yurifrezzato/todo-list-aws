@@ -1,25 +1,21 @@
 import groovy.json.JsonSlurper
 
+sam_config_env = 'production';
+github_branch = 'master';
+
 pipeline {
     agent any;
     
     stages {
         stage('Get Code') {
             steps {
-<<<<<<< HEAD
                 git "https://github.com/yurifrezzato/todo-list-aws.git"
 
                 sh 'ls -la'
                 echo "WORKSPACE: ${WORKSPACE}"
-                sh 'git checkout master'
-=======
-                withCredentials([usernamePassword(credentialsId: 'github_cred', passwordVariable: 'git_pass', usernameVariable: 'git_usr')]) {
-                    git "https://$git_usr:$git_pass@github.com/yurifrezzato/todo-list-aws.git"
-                }
+                sh "git checkout ${github_branch}"
                 
                 script {
-                    sam_config_env = 'staging';
-                    String github_branch = 'develop';
                 
                     sh 'ls -la'
                     echo "WORKSPACE: ${WORKSPACE}"
@@ -40,7 +36,6 @@ pipeline {
                     python3 -m bandit --exit-zero -r ./src -f custom -o bandit.out --msg-template "{abspath}:{line}: [{test_id}] {msg}"
                 '''
                 recordIssues tools: [pyLint(name: 'Bandit', pattern: 'bandit.out')];
->>>>>>> develop
             }
         }
         
@@ -49,10 +44,6 @@ pipeline {
                 script {
                     // Set variables
                     String sam_stack_name = 'todo-list-aws';
-<<<<<<< HEAD
-                    String sam_config_env = 'production';
-=======
->>>>>>> develop
                     String curr_stack_name = sam_stack_name + '-' + sam_config_env;
                     
                     String sam_region = 'us-east-1';

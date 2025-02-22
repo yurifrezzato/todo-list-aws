@@ -1,7 +1,7 @@
 import groovy.json.JsonSlurper
 
-sam_config_env = 'staging';
-github_branch = 'develop';
+sam_config_env = 'production';
+github_branch = 'master';
 
 pipeline {
     agent any;
@@ -35,7 +35,6 @@ pipeline {
                 script {
                     // Set variables
                     String sam_stack_name = 'todo-list-aws';
-                    String sam_config_env = 'production';
                     String curr_stack_name = sam_stack_name + '-' + sam_config_env;
                     
                     String sam_region = 'us-east-1';
