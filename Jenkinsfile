@@ -9,7 +9,9 @@ pipeline {
     stages {
         stage('Get Code') {
             steps {
-                git "https://github.com/yurifrezzato/todo-list-aws.git"
+                withCredentials([usernamePassword(credentialsId: 'github_cred', passwordVariable: 'git_pass', usernameVariable: 'git_usr')]) {
+                    git "https://$git_usr:$git_pass@github.com/yurifrezzato/todo-list-aws.git"
+                }
                 
                 sh 'ls -la'
                 echo "WORKSPACE: ${WORKSPACE}"
@@ -60,10 +62,29 @@ pipeline {
                 sh"""
                     export PYTHONPATH=${WORKSPACE}
                     export BASE_URL=${BASE_URL}
-                    python3 -m pytest -m readOnly --junitxml=result-rest.xml test/integration/todoApiTest.py
+                    python3 -m pytest --junitxml=result-rest.xml test/integration/todoApiTest.py
                 """
                 
                 junit 'result-rest.xml';
+            }
+        }
+        
+        stage('Promote') {
+            steps {
+                println('Write changes in file');
+                sh """
+                    echo '<br />new line ${BUILD_ID}' >> CHANGELOG.md
+                    git add .
+                    git commit -m '${BUILD_ID}'
+                    git push
+                """
+                
+                println('Merge and push changelog')
+                sh """
+                    git checkout master
+                    git merge develop
+                    git push --set-upstream origin master
+                """
             }
         }
     }
