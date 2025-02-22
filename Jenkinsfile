@@ -6,13 +6,17 @@ pipeline {
     stages {
         stage('Get Code') {
             steps {
+                sam_config_env = 'staging';
+                String github_branch = 'develop'
+                
                 withCredentials([usernamePassword(credentialsId: 'github_cred', passwordVariable: 'git_pass', usernameVariable: 'git_usr')]) {
                     git "https://$git_usr:$git_pass@github.com/yurifrezzato/todo-list-aws.git"
                 }
-
+                
                 sh 'ls -la'
                 echo "WORKSPACE: ${WORKSPACE}"
-                sh 'git checkout develop'
+                sh "git checkout ${github_branch}"
+                sh "wget https://raw.githubusercontent.com/yurifrezzato/todo-list-aws-config/${sam_config_env}/samconfig.toml"
             }
         }
         
@@ -35,7 +39,6 @@ pipeline {
                 script {
                     // Set variables
                     String sam_stack_name = 'todo-list-aws';
-                    String sam_config_env = 'staging';
                     String curr_stack_name = sam_stack_name + '-' + sam_config_env;
                     
                     String sam_region = 'us-east-1';
