@@ -22,7 +22,7 @@ pipeline {
                     sh 'ls -la'
                     echo "WORKSPACE: ${WORKSPACE}"
                     sh "git checkout ${github_branch}"
-                    sh "wget https://raw.githubusercontent.com/yurifrezzato/todo-list-aws-config/${sam_config_env}/samconfig.toml"
+                    sh "curl https://raw.githubusercontent.com/yurifrezzato/todo-list-aws-config/${sam_config_env}/samconfig.toml -o samconfig.toml"
                 }
                 
                 stash name: "github_code", includes: "**", useDefaultExcludes: false;
