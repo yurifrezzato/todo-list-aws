@@ -1,7 +1,7 @@
 import groovy.json.JsonSlurper
 
-sam_config_env = 'staging';
-github_branch = 'develop';
+sam_config_env = 'production';
+github_branch = 'master';
 
 pipeline {
     agent any;
@@ -9,28 +9,12 @@ pipeline {
     stages {
         stage('Get Code') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'github_cred', passwordVariable: 'git_pass', usernameVariable: 'git_usr')]) {
-                    git "https://$git_usr:$git_pass@github.com/yurifrezzato/todo-list-aws.git"
-                }
+                git "https://github.com/yurifrezzato/todo-list-aws.git"
                 
                 sh 'ls -la'
                 echo "WORKSPACE: ${WORKSPACE}"
                 sh "git checkout ${github_branch}"
                 sh "wget https://raw.githubusercontent.com/yurifrezzato/todo-list-aws-config/${sam_config_env}/samconfig.toml"
-            }
-        }
-        
-        stage('Static Test') {
-            steps {
-                sh '''
-                    python3 -m flake8 --exit-zero --format=pylint ./src > flake8.out
-                '''
-                recordIssues tools: [flake8(name: 'Flake8', pattern: 'flake8.out')];
-                
-                sh '''
-                    python3 -m bandit --exit-zero -r ./src -f custom -o bandit.out --msg-template "{abspath}:{line}: [{test_id}] {msg}"
-                '''
-                recordIssues tools: [pyLint(name: 'Bandit', pattern: 'bandit.out')];
             }
         }
         
@@ -66,25 +50,6 @@ pipeline {
                 """
                 
                 junit 'result-rest.xml';
-            }
-        }
-        
-        stage('Promote') {
-            steps {
-                println('Write changes in file');
-                sh """
-                    echo '<br />new line ${BUILD_ID}' >> CHANGELOG.md
-                    git add .
-                    git commit -m '${BUILD_ID}'
-                    git push
-                """
-                
-                println('Merge and push changelog')
-                sh """
-                    git checkout master
-                    git merge develop
-                    git push --set-upstream origin master
-                """
             }
         }
     }

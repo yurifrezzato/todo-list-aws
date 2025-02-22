@@ -1,7 +1,7 @@
 import groovy.json.JsonSlurper
 
-sam_config_env = 'staging';
-github_branch = 'develop';
+sam_config_env = 'production';
+github_branch = 'master';
 
 pipeline {
     agent any;
@@ -14,9 +14,7 @@ pipeline {
             steps {
                 get_info();
                 
-                withCredentials([usernamePassword(credentialsId: 'github_cred', passwordVariable: 'git_pass', usernameVariable: 'git_usr')]) {
-                    git "https://$git_usr:$git_pass@github.com/yurifrezzato/todo-list-aws.git"
-                }
+                git "https://github.com/yurifrezzato/todo-list-aws.git"
 
                 sh 'ls -la'
                 echo "WORKSPACE: ${WORKSPACE}"
@@ -24,31 +22,6 @@ pipeline {
                 sh "curl https://raw.githubusercontent.com/yurifrezzato/todo-list-aws-config/${sam_config_env}/samconfig.toml -o samconfig.toml"
                 
                 stash name: "github_code", includes: "**", useDefaultExcludes: false;
-            }
-            post {
-                cleanup {
-                    cleanWs();
-                }
-            }
-        }
-        
-        stage('Static Test') { // nodo1
-            agent {
-                label 'agent1'
-            }
-            steps {
-                get_info();
-                unstash "github_code";
-                
-                sh '''
-                    python3 -m flake8 --exit-zero --format=pylint ./src > flake8.out
-                '''
-                recordIssues tools: [flake8(name: 'Flake8', pattern: 'flake8.out')];
-                
-                sh '''
-                    python3 -m bandit --exit-zero -r ./src -f custom -o bandit.out --msg-template "{abspath}:{line}: [{test_id}] {msg}"
-                '''
-                recordIssues tools: [pyLint(name: 'Bandit', pattern: 'bandit.out')];
             }
             post {
                 cleanup {
@@ -111,34 +84,6 @@ pipeline {
                 """
                 
                 junit 'result-rest.xml';
-            }
-            post {
-                cleanup {
-                    cleanWs();
-                }
-            }
-        }
-        
-        stage('Promote') { // nodo pricipal
-            steps {
-                get_info();
-                unstash "github_code";
-                
-                println('Write changes in file');
-                
-                sh """
-                    echo '<br />new line ${BUILD_ID}' >> CHANGELOG.md
-                    git add .
-                    git commit -m '${BUILD_ID}'
-                    git push
-                """
-                
-                println('Merge and push changelog')
-                sh """
-                    git checkout master
-                    git merge develop
-                    git push --set-upstream origin master
-                """
             }
             post {
                 cleanup {
