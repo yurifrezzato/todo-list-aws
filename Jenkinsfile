@@ -6,19 +6,19 @@ pipeline {
     stages {
         stage('Get Code') {
             steps {
-                script {
-                    sam_config_env = 'staging';
-                    String github_branch = 'develop'
-                }
-                
                 withCredentials([usernamePassword(credentialsId: 'github_cred', passwordVariable: 'git_pass', usernameVariable: 'git_usr')]) {
                     git "https://$git_usr:$git_pass@github.com/yurifrezzato/todo-list-aws.git"
                 }
                 
-                sh 'ls -la'
-                echo "WORKSPACE: ${WORKSPACE}"
-                sh "git checkout ${github_branch}"
-                sh "wget https://raw.githubusercontent.com/yurifrezzato/todo-list-aws-config/${sam_config_env}/samconfig.toml"
+                script {
+                    sam_config_env = 'staging';
+                    String github_branch = 'develop';
+                
+                    sh 'ls -la'
+                    echo "WORKSPACE: ${WORKSPACE}"
+                    sh "git checkout ${github_branch}"
+                    sh "wget https://raw.githubusercontent.com/yurifrezzato/todo-list-aws-config/${sam_config_env}/samconfig.toml"
+                }
             }
         }
         
